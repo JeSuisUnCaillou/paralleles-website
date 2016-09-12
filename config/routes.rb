@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   
   root 'home#home'
+  resources :image
+  get 'first_frame', to: 'webcomic#first_frame'
+  
   
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
