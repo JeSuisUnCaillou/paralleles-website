@@ -20,7 +20,7 @@ class Frame
     #    right/
     #      ...
     def initialize(*ids_string)
-        raise ArgumentError.new("no more than 2 images per frame") if ids_string.length > 2
+        raise ArgumentError.new("only one or two images per frame") if ids_string.empty? || ids_string.length > 2
         @ids = ids_string
         @images_paths = @ids.map{ |id| 
             raise ArgumentError.new("Wrong image id : #{id}") if Dir.glob("app/assets/images/webcomic/#{id}.jpg").empty?
