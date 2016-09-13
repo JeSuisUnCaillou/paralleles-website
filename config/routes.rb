@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   
   root 'home#home'
-  resources :image
-  get 'first_frame', to: 'webcomic#first_frame'
+  resources :frame, only: [:show]
+  get 'first_frame', to: 'frame#first_frame'
   
   
   # The priority is based upon order of creation: first created -> highest priority.
