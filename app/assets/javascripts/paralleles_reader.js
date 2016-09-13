@@ -29,6 +29,8 @@ $(document).ready(function() {
         var height = (frame_height + margin) * nb_frames;
         //next_button height
         var button_height = frame_height / 4;
+        //number of slide up of the slider group
+        var nb_animate_slider = 0;
         
         //Create canevas
         var canevas = SVG('canevas').size(width, height);
@@ -43,7 +45,8 @@ $(document).ready(function() {
             
             next_button.click(function(){
                 console.log("animate");
-                slider.animate(100).move(0, -1*(frame_height + margin));
+                nb_animate_slider = nb_animate_slider + 1;
+                slider.animate(100).move(0, -1*(frame_height + margin) * nb_animate_slider);
                 console.log("animate fini")
                 //slider.finish();
             });
