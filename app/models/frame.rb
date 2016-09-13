@@ -22,45 +22,47 @@ class Frame
     #      ...
     #    right/
     #      ...
+    #
     def initialize(*ids_string)
         raise ArgumentError.new("only one or two images per frame") if ids_string.empty? || ids_string.length > 2
-        @ids = ids_string
-        @images_paths = @ids.map{ |id| 
-            raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths("#{id}#{EXTENSION}").empty?
-            real_asset_path("webcomic/#{id}.jpg")
+        @ids = ids_string.map{ |id|
+            "#{id}#{EXTENSION}"
         }
-        
+        @images_paths = @ids.map{ |id|
+            raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
+            id_to_image_path(id)
+        }
+        @next_ids = Frame.get_next_images_ids(@ids.first)
     end
 
-    
-    # def initialize(image_path, next_images_paths)
-    #     self.image_src = real_asset_path(image_path)
-    #     next_images_paths = [next_images_paths] unless next_images_paths.is_a? Array
-    #     self.next_images_src = next_images_paths.map{ |path| real_asset_path(path)}
-    # end
-    
-    def real_asset_path(image_path)
-        image_path.present? ? ActionController::Base.helpers.asset_path(image_path) : ""
+    def id_to_image_path(id)
+        raise ArgumentError.new("Id must be present") if id.blank?
+        image_path = "webcomic/#{id}"
+        ActionController::Base.helpers.asset_path(image_path)
     end
     
-    def self.get_next_images_paths(id)
-        folder = id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/')
-        folder = '' if folder == "/"
+    def self.get_next_images_ids(id)
+        folder = id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/') #gets the folders part in a string like 'right/left/35'
         images_paths = Frame.images_paths(folder)
         position = images_paths.find_index(id)
         raise ArgumentError.new("Bad image id") if position.nil?
-        next_image_path = images_paths[position + 1]
-        return next_image_path
+        if position + 1 <= images_paths.length - 1
+            next_paths = [images_paths[position + 1]]
+        else
+            next_paths = [Frame.images_paths("left/").first, Frame.images_paths("right/").first]
+        end
+        return next_paths
     end
     
         
     def self.first_frame
-       Frame.new("1") 
+       Frame.new("1")
     end
     
     # Lists all images paths in the folder app/assets/images/webcomic/#{folder}
     # folder can be a file too, to check if it exist
     def self.images_paths(folder="")
+        folder = '' if folder == "/"
         folder += "*" if folder !~ /#{EXTENSION}$/
         Dir.glob("#{WEBCOMIC_PATH}#{folder}").map{ |s| s.gsub(WEBCOMIC_PATH, '') }.sort{ |x, y|
             x = x.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_i
@@ -68,5 +70,6 @@ class Frame
             x <=> y
         }
     end
+
 
 end

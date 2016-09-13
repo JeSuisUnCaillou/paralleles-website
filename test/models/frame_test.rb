@@ -35,14 +35,15 @@ class FrameTest < ActiveSupport::TestCase
         assert Frame.new("3").images_paths.first !~ /webcomic\/3\.jpg/
     end
     
-    test "get_next_images_paths should get the on or two next images paths" do
-        assert_equal "2.jpg", Frame.get_next_images_paths("1.jpg")
-        assert_equal "14.jpg", Frame.get_next_images_paths("10.jpg")
+    test "get_next_images_ids should get the on or two next images ids" do
+        assert_equal ["2.jpg"], Frame.get_next_images_ids("1.jpg")
+        assert_equal ["14.jpg"], Frame.get_next_images_ids("10.jpg")
+        assert_equal ["left/38.jpg", "right/38b.jpg"], Frame.get_next_images_ids("37.jpg")
     end
     
-    test "get_next_images_paths should raise an error on bad image path" do
+    test "get_next_images_ids should raise an error on bad image path" do
         assert_raise ArgumentError do
-            Frame.get_next_images_paths("caca")
+            Frame.get_next_images_ids("caca")
         end
     end
     
@@ -55,4 +56,5 @@ class FrameTest < ActiveSupport::TestCase
        a = Frame.images_paths('left/')
        assert 3 < a.length
     end
+
 end
