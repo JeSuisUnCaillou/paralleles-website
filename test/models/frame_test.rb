@@ -10,8 +10,8 @@ class FrameTest < ActiveSupport::TestCase
         assert_respond_to frame, :next_ids
     end
     
-    test "should create a frame with two images" do
-        frame = Frame.new("1", "2")
+    test "should create a frame with two images, with and without extension" do
+        frame = Frame.new("1", "2.jpg")
         assert_equal 2, frame.ids.length
         assert_equal 2, frame.images_paths.length
     end

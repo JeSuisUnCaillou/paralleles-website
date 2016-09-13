@@ -26,7 +26,8 @@ class Frame
     def initialize(*ids_string)
         raise ArgumentError.new("only one or two images per frame") if ids_string.empty? || ids_string.length > 2
         @ids = ids_string.map{ |id|
-            "#{id}#{EXTENSION}"
+            id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
+            id
         }
         @images_paths = @ids.map{ |id|
             raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
@@ -35,12 +36,14 @@ class Frame
         @next_ids = Frame.get_next_images_ids(@ids.first)
     end
 
+    #converts an id like "left/22.jpg" into its asset path
     def id_to_image_path(id)
         raise ArgumentError.new("Id must be present") if id.blank?
         image_path = "webcomic/#{id}"
         ActionController::Base.helpers.asset_path(image_path)
     end
     
+    #Gets the ids of the next images in the image tree
     def self.get_next_images_ids(id)
         folder = id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/') #gets the folders part in a string like 'right/left/35'
         images_paths = Frame.images_paths(folder)
@@ -56,7 +59,7 @@ class Frame
     
         
     def self.first_frame
-       Frame.new("1")
+       Frame.new("1.jpg")
     end
     
     # Lists all images paths in the folder app/assets/images/webcomic/#{folder}
