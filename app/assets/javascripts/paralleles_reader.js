@@ -31,20 +31,30 @@ $(document).ready(function() {
         //Create canevas
         var canevas = SVG('canevas').size(width, height);
 
-        var create_rect = function(x, y, width, height){
-            var rect = canevas.rect(width, height).attr({ fill: 'grey' }).translate(x, y);
-            rect.click(function() {
-                this.animate().move(0, -1*(frame_height + margin));
-            })
-            return rect;
+        var create_frame = function(image_path, x, y){
+            var frame_group = canevas.group();
+            var rect = frame_group.rect(frame_width, frame_height).attr({ fill: 'grey' }).translate(x, y);
+            var frame = frame_group.image(image_path, frame_width, frame_height).translate(x, y);
+            frame_group.click(function(){
+               this.animate().move(0, -1*(frame_height + margin));
+            });
+            return frame;
         };
         
-        //Draw dumb rectangles
-        var rect1 = create_rect(0, 0, frame_width, frame_height);
-        var rect2 = create_rect(frame_width + margin, 0, frame_width, frame_height);
+        //Get the first frame
+        $.ajax({url: "first_frame", success: function(result){
+            console.log(result);
+            create_frame(result["image_src"], width/4, 0);
+            create_frame(result["next_images_src"][0], width/4, frame_height + margin)
+        }});
         
-        var rect3 = create_rect(0, frame_height + margin, frame_width, frame_height);
-        var rect3 = create_rect(frame_width + margin, frame_height + margin, frame_width, frame_height);
+        //Draw dumb frames
+        // var image_1 = '/assets/webcomic/2-d26470ecc1641c7973a9cc2bcf4f0c395f95f31dec71bc847f569051faefc5fa.jpg';
+        // var rect1 = create_frame(image_1, 0, 0);
+        // var rect2 = create_frame(image_1, frame_width + margin, 0);
+        
+        // var rect3 = create_frame(image_1, 0, frame_height + margin);
+        // var rect3 = create_frame(image_1, frame_width + margin, frame_height + margin);
         
     } else {
       alert('SVG not supported')
