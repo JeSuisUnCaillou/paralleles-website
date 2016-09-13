@@ -6,6 +6,7 @@ class FrameTest < ActiveSupport::TestCase
         assert_not_nil frame
         assert_respond_to frame, :ids
         assert_respond_to frame, :images_paths
+        assert_respond_to frame, :next_frames_paths
         
         assert_respond_to frame, :next_ids
     end

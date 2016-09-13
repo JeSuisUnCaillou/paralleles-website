@@ -2,7 +2,7 @@ class Frame
     WEBCOMIC_PATH = "app/assets/images/webcomic/"
     EXTENSION = ".jpg"
     
-    attr_accessor :ids, :images_paths, :next_ids
+    attr_accessor :ids, :images_paths, :next_ids, :next_frames_paths
     
     #Creates a new frame by finding it by its ids (one or two)
     #Frames ids are like this : "left/right/21" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
@@ -34,6 +34,9 @@ class Frame
             id_to_image_path(id)
         }
         @next_ids = Frame.get_next_images_ids(@ids.first)
+        @next_frames_paths = @next_ids.map{ |id|
+             "frame/#{id}"
+        }
     end
 
     #converts an id like "left/22.jpg" into its asset path
