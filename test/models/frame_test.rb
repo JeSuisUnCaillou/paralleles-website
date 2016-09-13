@@ -31,6 +31,11 @@ class FrameTest < ActiveSupport::TestCase
        end
     end
     
+    test "id_to_image_path should convert an id to its long asset path" do
+       frame = Frame.new("3.jpg")
+       assert 45 < frame.id_to_image_path(frame.ids.first).length
+    end
+    
     test "should get a compiled image path" do
         assert Frame.new("3").images_paths.first !~ /webcomic\/3\.jpg/
     end
