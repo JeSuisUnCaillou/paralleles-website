@@ -4,3 +4,11 @@
 .red {
     color: #d9534f;
 }
+
+
+.hoverable{
+    opacity: 0;
+}
+.hoverable:hover {
+    opacity: 0.5;
+}

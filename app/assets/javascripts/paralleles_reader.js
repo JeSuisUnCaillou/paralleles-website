@@ -27,16 +27,25 @@ $(document).ready(function() {
         var frame_height = frame_width * 6/9;
         //Canevas height
         var height = (frame_height + margin) * nb_frames;
+        //next_button height
+        var button_height = frame_height / 4;
         
         //Create canevas
         var canevas = SVG('canevas').size(width, height);
+        var slider = canevas.group();
 
         var create_frame = function(image_path, x, y){
-            var frame_group = canevas.group();
+            var frame_group = slider.group();
             var rect = frame_group.rect(frame_width, frame_height).attr({ fill: 'grey' }).translate(x, y);
             var frame = frame_group.image(image_path, frame_width, frame_height).translate(x, y);
-            frame_group.click(function(){
-               this.animate().move(0, -1*(frame_height + margin));
+            var next_button = frame_group.rect(frame_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
+            var next_arrow = frame_group.polyline('0,0 50,50 100,0').translate(x + frame_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
+            
+            next_button.click(function(){
+                console.log("animate");
+                slider.animate(100).move(0, -1*(frame_height + margin));
+                console.log("animate fini")
+                //slider.finish();
             });
             return frame;
         };
