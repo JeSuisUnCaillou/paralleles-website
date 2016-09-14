@@ -13,8 +13,9 @@ class FrameController < ApplicationController
     private
     
         def set_frame
-            id = frame_params[:id].gsub(';', '/')
-            @frame = Frame.new(id)
+            id = frame_params[:id]
+            ap "id: #{id}"
+            @frame = Frame.new("#{id}")
         end
 
         def frame_params

@@ -5,7 +5,7 @@ class Frame
     attr_accessor :ids, :images_paths, :next_ids, :next_frames_paths
     
     #Creates a new frame by finding it by its ids (one or two)
-    #Frames ids are like this : "left/right/21" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
+    #Frames ids are like this : "left/right/21" or "left;right;21.jpg" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
     #Files must be organised as following. The files names don't matter, the frame will always reference the next ones in its attributes
     #
     # webcomic/
@@ -27,7 +27,7 @@ class Frame
         raise ArgumentError.new("only one or two images per frame") if ids_string.empty? || ids_string.length > 2
         @ids = ids_string.map{ |id|
             id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
-            id
+            id.gsub(';', '/').gsub(',', '.')
         }
         @images_paths = @ids.map{ |id|
             raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
@@ -35,7 +35,7 @@ class Frame
         }
         @next_ids = Frame.get_next_images_ids(@ids.first)
         @next_frames_paths = @next_ids.map{ |id|
-             "frame/#{id}"
+             "frame/#{id.gsub('/', ';').gsub('.', ',')}"
         }
     end
 
@@ -60,7 +60,7 @@ class Frame
         return next_paths
     end
     
-        
+    #Gets the first frame
     def self.first_frame
        Frame.new("1.jpg")
     end
@@ -71,8 +71,8 @@ class Frame
         folder = '' if folder == "/"
         folder += "*" if folder !~ /#{EXTENSION}$/
         Dir.glob("#{WEBCOMIC_PATH}#{folder}").map{ |s| s.gsub(WEBCOMIC_PATH, '') }.sort{ |x, y|
-            x = x.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_i
-            y = y.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_i
+            x = x.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_f
+            y = y.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_f
             x <=> y
         }
     end

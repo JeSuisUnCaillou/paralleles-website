@@ -36,7 +36,7 @@ $(document).ready(function() {
         var canevas = SVG('canevas').size(width, height);
         var slider = canevas.group();
 
-        var create_frame = function(images_paths, x, y){
+        var create_frame = function(images_paths, next_frames_paths, x, y){
             var image_path = images_paths[0];
             var frame_group = slider.group();
             var rect = frame_group.rect(frame_width, frame_height).attr({ fill: 'grey' }).translate(x, y);
@@ -45,10 +45,16 @@ $(document).ready(function() {
             var next_arrow = frame_group.polyline('0,0 50,50 100,0').translate(x + frame_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
             
             next_button.click(function(){
-                console.log("animate");
+                nb_frames = next_frames_paths.length;
+                next_frames_paths.forEach(function(next_frame_path, index){
+                    $.ajax({url: next_frame_path, success: function(result){
+                        var x = nb_frames == 1 ? width/4 : (index == 0 ? 0 : frame_width + margin)
+                        create_frame(result["images_paths"], result["next_frames_paths"], x, nb_animate_slider * (frame_height + margin));
+                    }});
+                })
+                
                 nb_animate_slider = nb_animate_slider + 1;
-                slider.animate(100).move(0, -1*(frame_height + margin) * nb_animate_slider);
-                console.log("animate fini");
+                slider.animate(100).move(0, -1 * (frame_height + margin) * nb_animate_slider);
             });
             return frame;
         };
@@ -56,7 +62,7 @@ $(document).ready(function() {
         //Get the first frame
         $.ajax({url: "first_frame", success: function(result){
             console.log(result);
-            create_frame(result["images_paths"], width/4, 0);
+            create_frame(result["images_paths"], result["next_frames_paths"], width/4, 0);
             //create_frame(result["next_images_src"][0], width/4, frame_height + margin)
         }});
         
