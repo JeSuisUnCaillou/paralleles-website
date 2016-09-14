@@ -70,7 +70,7 @@ $(document).ready(function() {
         //Draw a next button in a parent_group, at a given position
         var draw_next_button = function(parent_group, next_frames_paths, button_width, x, y){
             var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
-            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + frame_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
+            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
             
             next_button.click(function(){
                 if(next_frames_paths.length == 1){
@@ -89,18 +89,20 @@ $(document).ready(function() {
                     temp_images_paths = []
                     temp_next_frames_paths = []
                     //left image
-                    $.ajax({url: next_frames_paths[0], async: false, success: function(result){
+                    $.ajax({url: next_frames_paths[0], success: function(result){
                         temp_images_paths = temp_images_paths.concat(result["images_paths"])
                         temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                        
+                        //get right image
+                        $.ajax({url: next_frames_paths[1], success: function(result){
+                            temp_images_paths = temp_images_paths.concat(result["images_paths"])
+                            temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                            //create the frame
+                            create_frame(temp_images_paths, temp_next_frames_paths)
+                            slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * nb_animate_slider);
+                        }})
                     }})
-                    //get right image
-                    $.ajax({url: next_frames_paths[1], async: false, success: function(result){
-                        temp_images_paths = temp_images_paths.concat(result["images_paths"])
-                        temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
-                    }})
-
-                    create_frame(temp_images_paths, temp_next_frames_paths)
-                    slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * nb_animate_slider);
+                    
                 } else {
                     console.log("Only one or two next_frames_paths accepted. Actual length : " + next_frames_paths.length)
                 }
