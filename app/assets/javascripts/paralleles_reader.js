@@ -112,7 +112,6 @@ $(document).ready(function() {
                     }})
                 } else if(next_frames_paths.length == 2){
                     console.log("double frame")
-                    nb_slider_up = nb_slider_up + 1
                     var temp_images_paths = []
                     var temp_next_frames_paths = []
                     //get left image
@@ -123,6 +122,8 @@ $(document).ready(function() {
                         $.ajax({url: next_frames_paths[1], success: function(result){
                             temp_images_paths = temp_images_paths.concat(result["images_paths"])
                             temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                            
+                            nb_slider_up = nb_slider_up + 1
                             //create the frame
                             create_frame(temp_images_paths, temp_next_frames_paths)
                             //move up the slider
