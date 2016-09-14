@@ -18,10 +18,15 @@ class FrameTest < ActiveSupport::TestCase
         assert_equal 2, frame.images_paths.length
     end
     
-    test "should not create a frame with none or more than 2 images" do 
-        assert_raise ArgumentError do
-            Frame.new()
-        end
+    test "should create an empty frame with no arguments" do
+        f = Frame.new
+        #all attributes of f should be empty arrays
+        assert_empty f.instance_variables.map{ |v| 
+            f.send(v[1..v.length]) #remove the @ before the attribute name
+        }.inject(:+)
+    end
+    
+    test "should not create a frame with more than 2 images" do 
         assert_raise ArgumentError do
             Frame.new("1", "2", "3")
         end

@@ -6,12 +6,13 @@ class Frame
     
     #Creates a new frame by finding it by its ids (one or two)
     #Frames ids are like this : "left/right/21" or "left;right;21.jpg" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
+    #If frames ids have some '/' and '.', it will replace them by some ';' and ','
     #Files must be organised as following. The files names don't matter, the frame will always reference the next ones in its attributes
     #
     # webcomic/
     #  1.jpg
-    #  2.jpg
-    #  3.jpg
+    #  2a.jpg
+    #  2b.jpg
     #  left/
     #    4.jpg
     #    5.jpg
@@ -24,7 +25,7 @@ class Frame
     #      ...
     #
     def initialize(*ids_string)
-        raise ArgumentError.new("only one or two images per frame") if ids_string.empty? || ids_string.length > 2
+        raise ArgumentError.new("only one or two images per frame") if ids_string.length > 2
         @ids = ids_string.map{ |id|
             id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
             id.gsub(';', '/').gsub(',', '.')
@@ -32,14 +33,14 @@ class Frame
         @images_paths = @ids.map{ |id| id_to_image_path(id) }
         @frame_paths = @ids.map{ |id| id_to_frame_path(id) }
         
-        @next_ids = Frame.get_next_images_ids(@ids.first)
+        @next_ids = @ids.map{|id| Frame.get_next_images_ids(id) }.inject(:+)
         @next_images_paths = @next_ids.map{ |id| id_to_image_path(id) }
         @next_frames_paths = @next_ids.map{ |id| id_to_frame_path(id) }
     end
 
     #converts an id like "left/22.jpg" into its asset path
     def id_to_image_path(id)
-        raise ArgumentError.new("Id must be present") if id.blank?
+        return nil if id.blank?
         raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
         image_path = "webcomic/#{id}"
         ActionController::Base.helpers.asset_path(image_path)
@@ -47,11 +48,14 @@ class Frame
     
     #converts an id like "left/22.jpg" into its frame path
     def id_to_frame_path(id)
+        return nil if id.blank?
         "frame/#{id.gsub('/', ';').gsub('.', ',')}"
     end
     
     #Gets the ids of the next images in the image tree
     def self.get_next_images_ids(id)
+        return [] if id.blank?
+        
         folder = "/".in?(id) ? id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/') : "" #gets the folders part in a string like 'right/left/35'
         images_paths = Frame.images_paths(folder)
         position = images_paths.find_index(id)
@@ -60,6 +64,7 @@ class Frame
             next_paths = [images_paths[position + 1]]
         else
             next_paths = [Frame.images_paths("#{folder}left/").first, Frame.images_paths("#{folder}right/").first]
+            next_paths = [] if next_paths == [nil, nil] #If there is no more left/ and right/ subfolder, return an empty array
         end
         return next_paths
     end
