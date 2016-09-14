@@ -89,6 +89,11 @@ $(document).ready(function() {
         
         //Draw a next button in a parent_group, at a given position
         var draw_next_button = function(parent_group, next_frames_paths, button_width, x, y){
+            //Do not create a next button if next_frames_paths is empty
+            if(next_frames_paths.length == 0){
+                return null;
+            }
+            
             var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
             var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
             
@@ -101,34 +106,38 @@ $(document).ready(function() {
                 }
                 //Otherwise, fetch and create the next frame before sliding up
                 if(next_frames_paths.length == 1){
+                    nb_slider_up = nb_slider_up + 1
                     console.log("solo frame")
                     $.ajax({url: next_frames_paths[0], success: function(result){
-                        nb_slider_up = nb_slider_up + 1
                         var new_x = width/4
                         var new_y = y + frame_height + margin
                         //create the frame
                         create_frame(result["images_paths"], result["next_frames_paths"], new_x, new_y)
                         //move up the slider
                         vertical_slide()
+                    }, error: function(){
+                        nb_slider_up = nb_slider_up - 1
                     }})
                 } else if(next_frames_paths.length == 2){
+                    nb_slider_up = nb_slider_up + 1
                     console.log("double frame")
-                    var temp_images_paths = []
-                    var temp_next_frames_paths = []
                     //get left image
                     $.ajax({url: next_frames_paths[0], success: function(result){
-                        temp_images_paths = temp_images_paths.concat(result["images_paths"])
-                        temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                        var left_images_paths = result["images_paths"]
+                        var left_next_frames_paths = result["next_frames_paths"]
                         //get right image
                         $.ajax({url: next_frames_paths[1], success: function(result){
-                            temp_images_paths = temp_images_paths.concat(result["images_paths"])
-                            temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
-                            nb_slider_up = nb_slider_up + 1
+                            var right_images_paths = result["images_paths"]
+                            var right_next_frames_paths = result["next_frames_paths"]
                             //create the frame
-                            create_frame(temp_images_paths, temp_next_frames_paths)
+                            create_frame(left_images_paths.concat(right_images_paths), left_next_frames_paths.concat(right_next_frames_paths))
                             //move up the slider
                             vertical_slide()
+                        }, error: function(){
+                            nb_slider_up = nb_slider_up - 1
                         }})
+                    }, error: function(){
+                        nb_slider_up = nb_slider_up - 1
                     }})
                     
                 } else {
