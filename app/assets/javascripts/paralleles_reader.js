@@ -92,7 +92,6 @@ $(document).ready(function() {
             var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
             var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
             
-            
             next_button.click(function(){
                 //If we have already moved down the slider, just move it up without creating a next frame
                 if(nb_slider_down > 0){
