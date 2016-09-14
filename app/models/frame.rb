@@ -2,7 +2,7 @@ class Frame
     WEBCOMIC_PATH = "app/assets/images/webcomic/"
     EXTENSION = ".jpg"
     
-    attr_accessor :ids, :images_paths, :next_ids, :next_frames_paths
+    attr_accessor :ids, :images_paths, :next_ids, :next_images_paths, :next_frames_paths
     
     #Creates a new frame by finding it by its ids (one or two)
     #Frames ids are like this : "left/right/21" or "left;right;21.jpg" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
@@ -29,11 +29,10 @@ class Frame
             id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
             id.gsub(';', '/').gsub(',', '.')
         }
-        @images_paths = @ids.map{ |id|
-            raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
-            id_to_image_path(id)
-        }
+        @images_paths = @ids.map{ |id| id_to_image_path(id) }
         @next_ids = Frame.get_next_images_ids(@ids.first)
+        
+        @next_images_paths = @next_ids.map{ |id| id_to_image_path(id) }
         @next_frames_paths = @next_ids.map{ |id|
              "frame/#{id.gsub('/', ';').gsub('.', ',')}"
         }
@@ -42,6 +41,7 @@ class Frame
     #converts an id like "left/22.jpg" into its asset path
     def id_to_image_path(id)
         raise ArgumentError.new("Id must be present") if id.blank?
+        raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
         image_path = "webcomic/#{id}"
         ActionController::Base.helpers.asset_path(image_path)
     end
