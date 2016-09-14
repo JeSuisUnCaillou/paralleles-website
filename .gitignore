@@ -15,3 +15,6 @@
 /log/*
 !/log/.keep
 /tmp
+
+# Ignore precompiled webcomic assets
+/public/assets/webcomic
