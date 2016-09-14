@@ -31,6 +31,9 @@ $(document).ready(function() {
         var button_height = frame_height / 4;
         //number of slide up of the slider group
         var nb_animate_slider = 0;
+        //starting frame
+        var starting_frame_paths = JSON.parse($("#starting_frame").attr("frame_paths"));
+        console.log("Starting by : " + starting_frame_paths[0])
         
         //Create canevas
         var canevas = SVG('canevas').size(width, height);
@@ -52,25 +55,6 @@ $(document).ready(function() {
             } else {
                 console.log("Only one or two images_paths accepted. Actual length : " + images_paths.length)
             }
-            
-            // var next_button = frame_group.rect(frame_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
-            // var next_arrow = frame_group.polyline('0,0 50,50 100,0').translate(x + frame_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
-            
-            // next_button.click(function(){
-            //     nb_frames = next_frames_paths.length;
-            //     next_frames_paths.forEach(function(next_frame_path, index){
-            //         $.ajax({url: next_frame_path, success: function(result){
-            //             var x = nb_frames == 1 ? width/4 : (index == 0 ? 0 : frame_width + margin)
-            //             create_frame(result["images_paths"], result["next_frames_paths"], x, nb_animate_slider * (frame_height + margin));
-            //         }});
-            //     })
-            //     nb_animate_slider = nb_animate_slider + 1;
-            //     slider.animate(100).move(0, -1 * (frame_height + margin) * nb_animate_slider);
-            // });
-            
-            
-            //increment the current y position
-            // y = y + frame_height + margin;
             
             return frame_group;
         };
@@ -96,7 +80,7 @@ $(document).ready(function() {
                         var new_y = y + frame_height + margin
                         
                         create_frame(result["images_paths"], result["next_frames_paths"], new_x, new_y)
-                        slider.animate(100).move(0, -1 * (frame_height + margin) * nb_animate_slider);
+                        slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * nb_animate_slider);
                     }})
                 } else if(next_frames_paths.length == 2){
                     console.log("TODO")
@@ -108,7 +92,7 @@ $(document).ready(function() {
         }
         
         //Get the first frame
-        $.ajax({url: "first_frame", success: function(result){
+        $.ajax({url: starting_frame_paths[0], success: function(result){
             console.log(result);
             create_frame(result["images_paths"], result["next_frames_paths"]);
             //create_frame(result["next_images_src"][0], width/4, frame_height + margin)

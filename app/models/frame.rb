@@ -2,7 +2,7 @@ class Frame
     WEBCOMIC_PATH = "app/assets/images/webcomic/"
     EXTENSION = ".jpg"
     
-    attr_accessor :ids, :images_paths, :next_ids, :next_images_paths, :next_frames_paths
+    attr_accessor :ids, :images_paths, :frame_paths, :next_ids, :next_images_paths, :next_frames_paths
     
     #Creates a new frame by finding it by its ids (one or two)
     #Frames ids are like this : "left/right/21" or "left;right;21.jpg" and it fetches the following frame app/assets/images/webcomic/left/right/21.jpg
@@ -30,12 +30,11 @@ class Frame
             id.gsub(';', '/').gsub(',', '.')
         }
         @images_paths = @ids.map{ |id| id_to_image_path(id) }
-        @next_ids = Frame.get_next_images_ids(@ids.first)
+        @frame_paths = @ids.map{ |id| id_to_frame_path(id) }
         
+        @next_ids = Frame.get_next_images_ids(@ids.first)
         @next_images_paths = @next_ids.map{ |id| id_to_image_path(id) }
-        @next_frames_paths = @next_ids.map{ |id|
-             "frame/#{id.gsub('/', ';').gsub('.', ',')}"
-        }
+        @next_frames_paths = @next_ids.map{ |id| id_to_frame_path(id) }
     end
 
     #converts an id like "left/22.jpg" into its asset path
@@ -44,6 +43,11 @@ class Frame
         raise ArgumentError.new("Wrong image id : #{id}") if Frame.images_paths(id).empty?
         image_path = "webcomic/#{id}"
         ActionController::Base.helpers.asset_path(image_path)
+    end
+    
+    #converts an id like "left/22.jpg" into its frame path
+    def id_to_frame_path(id)
+        "frame/#{id.gsub('/', ';').gsub('.', ',')}"
     end
     
     #Gets the ids of the next images in the image tree
