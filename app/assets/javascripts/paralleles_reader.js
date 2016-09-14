@@ -50,13 +50,13 @@ $(document).ready(function() {
                 var x = width/4;
                 var image_group = draw_image(frame_group, images_paths[0], x, y)
                 var next_button = draw_next_button(frame_group, next_frames_paths, frame_width, x, y)
-                var prev_button = draw_prev_button(frame_group, next_frames_paths, frame_width, x, y)
+                var prev_button = draw_prev_button(frame_group, frame_width, x, y)
             } else if(images_paths.length == 2) {
                 var x = 0;
                 var left_image_group = draw_image(frame_group, images_paths[0], x, y)
                 var right_image_group = draw_image(frame_group, images_paths[1], x + frame_width + margin, y)
                 var next_button = draw_next_button(frame_group, next_frames_paths, width, x, y)
-                var prev_button = draw_prev_button(frame_group, next_frames_paths, width, x, y)
+                var prev_button = draw_prev_button(frame_group, width, x, y)
             } else {
                 console.log("Only one or two images_paths accepted. Actual length : " + images_paths.length)
             }
@@ -73,7 +73,10 @@ $(document).ready(function() {
         };
         
         //Draw a next button in a parent_group, at a given position
-        var draw_prev_button = function(parent_group, next_frames_paths, button_width, x, y){
+        var draw_prev_button = function(parent_group, button_width, x, y){
+            if(nb_slider_up == 0){
+                return null;
+            }
             var prev_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y)
             var prev_arrow = parent_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
             
