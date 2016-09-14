@@ -44,8 +44,8 @@ $(document).ready(function() {
 
         var create_frame = function(images_paths, next_frames_paths){
             var frame_group = slider.group();
-            
             var y = nb_slider_up * (frame_height + margin)
+            
             if(images_paths.length == 1){
                 var x = width/4;
                 var image_group = draw_image(frame_group, images_paths[0], x, y)
@@ -74,6 +74,7 @@ $(document).ready(function() {
         
         //Draw a next button in a parent_group, at a given position
         var draw_prev_button = function(parent_group, button_width, x, y){
+            //Do not create a prev button if we havent moved up the slider (aka : for the first frame)
             if(nb_slider_up == 0){
                 return null;
             }
@@ -93,12 +94,13 @@ $(document).ready(function() {
             
             
             next_button.click(function(){
+                //If we have already moved down the slider, just move it up without creating a next frame
                 if(nb_slider_down > 0){
                     nb_slider_down = nb_slider_down - 1
                     slide_up()
                     return null;
                 }
-                
+                //Otherwise, fetch and create the next frame before sliding up
                 if(next_frames_paths.length == 1){
                     console.log("solo frame")
                     $.ajax({url: next_frames_paths[0], success: function(result){
