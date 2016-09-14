@@ -15,7 +15,7 @@ $(document).ready(function() {
         var parent_padding = get_parent_horizontal_padding($("#canevas"));
         
         //Number of frames or twin frames displayed at once
-        var nb_frames = 2;
+        var nb_frames = 1;
         
         //Canevas width
         var width = $("#canevas").parent().width() - parent_padding/2; 
