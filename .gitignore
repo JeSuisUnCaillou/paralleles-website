@@ -17,4 +17,5 @@
 /tmp
 
 # Ignore precompiled webcomic assets
-/public/assets/webcomic
+/public/assets
+
