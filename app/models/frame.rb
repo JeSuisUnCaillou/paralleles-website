@@ -48,14 +48,14 @@ class Frame
     
     #Gets the ids of the next images in the image tree
     def self.get_next_images_ids(id)
-        folder = id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/') #gets the folders part in a string like 'right/left/35'
+        folder = "/".in?(id) ? id.gsub(/(^[^\/]+|\/[^\/]+?)$/, '/') : "" #gets the folders part in a string like 'right/left/35'
         images_paths = Frame.images_paths(folder)
         position = images_paths.find_index(id)
         raise ArgumentError.new("Bad image id") if position.nil?
         if position + 1 <= images_paths.length - 1
             next_paths = [images_paths[position + 1]]
         else
-            next_paths = [Frame.images_paths("left/").first, Frame.images_paths("right/").first]
+            next_paths = [Frame.images_paths("#{folder}left/").first, Frame.images_paths("#{folder}right/").first]
         end
         return next_paths
     end

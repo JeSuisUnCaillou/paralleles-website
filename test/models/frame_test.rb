@@ -41,7 +41,7 @@ class FrameTest < ActiveSupport::TestCase
         assert Frame.new("3").images_paths.first !~ /webcomic\/3\.jpg/
     end
     
-    test "get_next_images_ids should get the on or two next images ids" do
+    test "get_next_images_ids should get the one or two next images ids" do
         assert_equal ["2.jpg"], Frame.get_next_images_ids("1.jpg")
         assert_equal ["14.jpg"], Frame.get_next_images_ids("10.jpg")
         assert_equal ["left/38.jpg", "right/38b.jpg"], Frame.get_next_images_ids("37.jpg")
