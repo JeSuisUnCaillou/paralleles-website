@@ -74,6 +74,7 @@ $(document).ready(function() {
             
             next_button.click(function(){
                 if(next_frames_paths.length == 1){
+                    console.log("solo frame")
                     $.ajax({url: next_frames_paths[0], success: function(result){
                         nb_animate_slider = nb_animate_slider + 1
                         var new_x = width/4
@@ -83,7 +84,23 @@ $(document).ready(function() {
                         slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * nb_animate_slider);
                     }})
                 } else if(next_frames_paths.length == 2){
-                    console.log("TODO")
+                    console.log("double frame")
+                    nb_animate_slider = nb_animate_slider + 1
+                    temp_images_paths = []
+                    temp_next_frames_paths = []
+                    //left image
+                    $.ajax({url: next_frames_paths[0], async: false, success: function(result){
+                        temp_images_paths = temp_images_paths.concat(result["images_paths"])
+                        temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                    }})
+                    //get right image
+                    $.ajax({url: next_frames_paths[1], async: false, success: function(result){
+                        temp_images_paths = temp_images_paths.concat(result["images_paths"])
+                        temp_next_frames_paths = temp_next_frames_paths.concat(result["next_frames_paths"])
+                    }})
+
+                    create_frame(temp_images_paths, temp_next_frames_paths)
+                    slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * nb_animate_slider);
                 } else {
                     console.log("Only one or two next_frames_paths accepted. Actual length : " + next_frames_paths.length)
                 }
