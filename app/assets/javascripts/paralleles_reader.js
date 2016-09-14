@@ -33,6 +33,8 @@ $(document).ready(function() {
         var nb_slider_up = 0;
         //number of slide down of the slider group
         var nb_slider_down = 0;
+        //number of slide right of the slider group
+        var nb_slider_right = 0;
         
         //starting frame
         var starting_frame_paths = JSON.parse($("#starting_frame").attr("frame_paths"));
@@ -45,39 +47,61 @@ $(document).ready(function() {
         var create_frame = function(images_paths, next_frames_paths){
             var frame_group = slider.group();
             var y = nb_slider_up * (frame_height + margin)
+            var x = nb_slider_right * (frame_width + margin) / 2
             
             if(images_paths.length == 1){
-                var x = width/4;
+                x = x + width/4;
                 var image_group = draw_image(frame_group, images_paths[0], x, y)
                 var next_button = draw_next_button(frame_group, next_frames_paths, frame_width, x, y)
                 var prev_button = draw_prev_button(frame_group, frame_width, x, y)
             } else if(images_paths.length == 2) {
-                var x = 0;
                 var left_images_paths = images_paths[0]
                 var right_images_paths = images_paths[1]
-                var next_button_width = width;
-                var x_button = x;
-                // console.log("LEFT " + JSON.stringify(left_images_paths));
-                // console.log("RIGHT " + JSON.stringify(right_images_paths));
+                var left_next_frames_paths = next_frames_paths[0]
+                var right_next_frames_paths = next_frames_paths[1]
+                var prev_button_width = width;
+                var x_prev_button = x
+                var x_next_button = x
                 
+                //Draws the left image
                 if(left_images_paths != undefined){
                     var left_x = x;
                     var left_image_group = draw_image(frame_group, left_images_paths, left_x, y)
-                    if(right_images_paths == undefined){ x_button = left_x }
+                    if(right_images_paths == undefined){ x_prev_button = left_x; x_next_button = x }
                 } else {
-                    next_button_width = frame_width;
+                    prev_button_width = frame_width;
                 }
-                
+                //Draws the right image
                 if(right_images_paths != undefined){
                     var right_x = x + frame_width + margin
                     var right_image_group = draw_image(frame_group, right_images_paths, right_x, y)
-                    if(left_images_paths == undefined){ x_button = right_x }
+                    if(left_images_paths == undefined){ x_prev_button = right_x; x_next_button = x + frame_width + margin }
                 } else {
-                    next_button_width = frame_width;
+                    prev_button_width = frame_width;
                 }
                 
-                var next_button = draw_next_button(frame_group, next_frames_paths, next_button_width, x_button, y)
-                var prev_button = draw_prev_button(frame_group, next_button_width, x_button, y)
+                //Draws the next button(s)
+                if(left_next_frames_paths.length > 0 && right_next_frames_paths.length > 0){
+                    //One next button
+                    var next_button = draw_next_button(frame_group, next_frames_paths, width, x_next_button, y)
+                } else {
+                    //Two next buttons
+                    var x_dumb_button = x
+                    if(left_next_frames_paths.length == 0){
+                        var frames_paths = right_next_frames_paths
+                        x_dumb_button = x
+                        x_next_button = x + frame_width + margin
+                    } else if (right_next_frames_paths.length == 0){
+                        var frames_paths = left_next_frames_paths
+                        x_dumb_button = x + frame_width + margin
+                        x_next_button = x
+                    }
+                    var next_button = draw_next_button(frame_group, frames_paths, frame_width, x_next_button, y)
+                    var dumb_button = draw_dumb_button(frame_group, frame_width, x_dumb_button, y)
+                }
+                //Draws the prev button
+                var prev_button = draw_prev_button(frame_group, prev_button_width, x_prev_button, y)
+                
             } else {
                 console.log("Only one or two images_paths accepted. Actual length : " + images_paths.length)
             }
@@ -101,7 +125,7 @@ $(document).ready(function() {
             //Do not create a prev button if we havent moved up the slider (aka : for the first frame)
             if(nb_slider_up == 0){ return null; }
             var prev_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y)
-            var prev_arrow = parent_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
+            var prev_arrow = parent_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             
             prev_button.click(function(){
                 nb_slider_down = nb_slider_down + 1
@@ -109,13 +133,20 @@ $(document).ready(function() {
             })
         }
         
+        //Draw a dumb button for frames with no next
+        var draw_dumb_button = function(parent_group, button_width, x, y){
+            var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
+            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "red" })
+        }
+        
         //Draw a next button in a parent_group, at a given position
         var draw_next_button = function(parent_group, next_frames_paths, button_width, x, y){
             //Do not create a next button if next_frames_paths is empty
-            if(next_frames_paths.length == 0){ return null; }
+            console.log(JSON.stringify(next_frames_paths))
+            if(next_frames_paths == [undefined, undefined] || next_frames_paths.length == 0){ return null; }
             
             var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
-            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "white" })
+            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             
             next_button.click(function(){
                 //If we have already moved down the slider, just move it up without creating a next frame
