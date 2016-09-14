@@ -14,7 +14,7 @@ class FrameController < ApplicationController
     
         def set_frame
             id = frame_params[:id]
-            ap "id: #{id}"
+            puts "id: #{id}"
             @frame = Frame.new("#{id}")
         end
 
