@@ -83,7 +83,7 @@ $(document).ready(function() {
             
             prev_button.click(function(){
                 nb_slider_down = nb_slider_down + 1
-                slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * (nb_slider_up - nb_slider_down));
+                vertical_slide()
             })
         }
         
@@ -97,7 +97,7 @@ $(document).ready(function() {
                 //If we have already moved down the slider, just move it up without creating a next frame
                 if(nb_slider_down > 0){
                     nb_slider_down = nb_slider_down - 1
-                    slide_up()
+                    vertical_slide()
                     return null;
                 }
                 //Otherwise, fetch and create the next frame before sliding up
@@ -110,7 +110,7 @@ $(document).ready(function() {
                         //create the frame
                         create_frame(result["images_paths"], result["next_frames_paths"], new_x, new_y)
                         //move up the slider
-                        slide_up()
+                        vertical_slide()
                     }})
                 } else if(next_frames_paths.length == 2){
                     console.log("double frame")
@@ -129,7 +129,7 @@ $(document).ready(function() {
                             //create the frame
                             create_frame(temp_images_paths, temp_next_frames_paths)
                             //move up the slider
-                            slide_up()
+                            vertical_slide()
                         }})
                     }})
                     
@@ -141,7 +141,7 @@ $(document).ready(function() {
         }
         
         //slides the slider group up one time
-        var slide_up = function(){
+        var vertical_slide = function(){
             slider.animate(1000, ">").move(0, -1 * (frame_height + margin) * (nb_slider_up - nb_slider_down));
         }
         
