@@ -1,6 +1,7 @@
 /*
  global SVG
  global $
+ global Image
 */
 
 $(document).ready(function() {
@@ -44,14 +45,14 @@ $(document).ready(function() {
         var canevas = SVG('canevas').size(width, height);
         var slider = canevas.group();
 
-        var create_frame = function(images_paths, next_frames_paths, left_slide){
+        var create_frame = function(images_paths, next_images_paths, next_frames_paths, left_slide){
             var frame_group = slider.group();
             var y = nb_slider_up * (frame_height + margin)
             var x = -1 * nb_slider_right * (frame_width + margin) / 2
             
             if(images_paths.length == 1){
                 x = x + width/4;
-                var image_group = draw_image(frame_group, images_paths[0], x, y)
+                var image_group = draw_image(frame_group, images_paths[0], next_images_paths, x, y)
                 var next_button = draw_next_button(frame_group, next_frames_paths, frame_width, x, y, 0)
                 var prev_button = draw_prev_button(frame_group, frame_width, x, y, left_slide)
             } else if(images_paths.length == 2) {
@@ -70,7 +71,7 @@ $(document).ready(function() {
                         x_prev_button = left_x
                         x_next_button = x
                     }
-                    var left_image_group = draw_image(frame_group, left_images_paths, left_x, y)
+                    var left_image_group = draw_image(frame_group, left_images_paths, next_images_paths, left_x, y)
 
                 } else {
                     prev_button_width = frame_width;
@@ -82,7 +83,7 @@ $(document).ready(function() {
                         x_next_button = x + frame_width + margin
                     }
                     var right_x = x + frame_width + margin
-                    var right_image_group = draw_image(frame_group, right_images_paths, right_x, y)
+                    var right_image_group = draw_image(frame_group, right_images_paths, next_images_paths, right_x, y)
                 } else {
                     prev_button_width = frame_width;
                 }
@@ -121,13 +122,14 @@ $(document).ready(function() {
         };
         
         //Draw an image in a parent_group, at a given position
-        var draw_image = function(parent_group, image_path, x, y){
+        var draw_image = function(parent_group, image_path, next_images_paths, x, y){
             //Do not draw the image if there is no image_path
             //if(image_path == undefined){ return null; }
             
             var image_group = parent_group.group();
             var rect = image_group.rect(frame_width, frame_height).attr({ fill: 'grey' }).translate(x, y);
             var frame = image_group.image(image_path, frame_width, frame_height).translate(x, y);
+            preload(flatten(next_images_paths));
             return image_group;
         };
         
@@ -141,7 +143,8 @@ $(document).ready(function() {
             prev_button.click(function(){
                 nb_slider_down = nb_slider_down + 1
                 nb_slider_right = nb_slider_right - left_slide
-                make_it_slide()
+                var with_movement = (left_slide != 0)
+                make_it_slide(with_movement)
             })
         }
         
@@ -159,13 +162,14 @@ $(document).ready(function() {
             
             var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
             var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
+            var with_movement = (right_slide != 0)
             
             next_button.click(function(){
                 //If we have already moved down the slider, just move it up without creating a next frame
                 if(nb_slider_down > 0){
                     nb_slider_down = nb_slider_down - 1
                     nb_slider_right = nb_slider_right + right_slide
-                    make_it_slide()
+                    make_it_slide(with_movement)
                     return null;
                 }
                 //Otherwise, fetch and create the next frame before sliding up
@@ -174,9 +178,9 @@ $(document).ready(function() {
                     nb_slider_right = nb_slider_right + right_slide
                     $.ajax({url: next_frames_paths[0], success: function(result){
                         //create the frame
-                        create_frame(result["images_paths"], result["next_frames_paths"], right_slide)
+                        create_frame(result["images_paths"], result["next_images_paths"], result["next_frames_paths"], right_slide)
                         //move up the slider
-                        make_it_slide()
+                        make_it_slide(with_movement)
                     }, error: function(){
                         nb_slider_up = nb_slider_up - 1
                         nb_slider_right = nb_slider_right - right_slide
@@ -191,14 +195,16 @@ $(document).ready(function() {
                     $.ajax({url: left_frames_paths, success: function(result){
                         var left_images_paths = result["images_paths"]
                         var left_next_frames_paths = result["next_frames_paths"]
+                        var left_next_images_paths = result["next_images_paths"]
                         //get right image
                         $.ajax({url: right_frames_paths, success: function(result){
                             var right_images_paths = result["images_paths"]
                             var right_next_frames_paths = result["next_frames_paths"]
+                            var right_next_images_paths = result["next_images_paths"]
                             //create the frame
-                            create_frame([left_images_paths, right_images_paths], [left_next_frames_paths, right_next_frames_paths], right_slide)
+                            create_frame([left_images_paths, right_images_paths], left_next_images_paths.concat(right_next_images_paths), [left_next_frames_paths, right_next_frames_paths], right_slide)
                             //move up the slider
-                            make_it_slide()
+                            make_it_slide(with_movement)
                         }, error: function(){
                             nb_slider_up = nb_slider_up - 1
                             nb_slider_right = nb_slider_right - right_slide
@@ -216,15 +222,41 @@ $(document).ready(function() {
         }
         
         //slides the slider group up one time
-        var make_it_slide = function(){
-            slider.animate(500, ">").move(nb_slider_right * (frame_width + margin) / 2, -1 * (frame_height + margin) * (nb_slider_up - nb_slider_down));
+        var make_it_slide = function(with_movement){
+            var x = nb_slider_right * (frame_width + margin) / 2
+            var y = -1 * (frame_height + margin) * (nb_slider_up - nb_slider_down)
+            if(with_movement){
+                slider.animate(500, ">").move(x, y);
+            } else {
+                slider.move(x, y);
+            }
+        }
+        
+        //preloads the images
+        var preload = function(images_paths){
+            for (var i = 0; i < images_paths.length; i++) {
+				var img = new Image()
+				img.src = images_paths[i]
+			}
+        }
+        
+        //flattens an array
+        var flatten = function(ary) {
+            var ret = [];
+            for(var i = 0; i < ary.length; i++) {
+                if(Array.isArray(ary[i])) {
+                    ret = ret.concat(flatten(ary[i]));
+                } else {
+                    ret.push(ary[i]);
+                }
+            }
+            return ret;
         }
         
         //Get the first frame
         $.ajax({url: starting_frame_paths[0], success: function(result){
             console.log(result);
-            create_frame(result["images_paths"], result["next_frames_paths"], 0);
-            //create_frame(result["next_images_src"][0], width/4, frame_height + margin)
+            create_frame(result["images_paths"], result["next_images_paths"], result["next_frames_paths"], 0);
         }});
         
     } else {
