@@ -63,7 +63,7 @@ class Frame
         if position + 1 <= images_paths.length - 1
             next_paths = [images_paths[position + 1]]
         else
-            next_paths = [Frame.images_paths("#{folder}left/").first, Frame.images_paths("#{folder}right/").first]
+            next_paths = [Frame.images_paths("#{folder}left/", no_folder: true).first, Frame.images_paths("#{folder}right/", no_folder: true).first]
             next_paths = [] if next_paths == [nil, nil] #If there is no more left/ and right/ subfolder, return an empty array
         end
         return next_paths
@@ -76,10 +76,16 @@ class Frame
     
     # Lists all images paths in the folder app/assets/images/webcomic/#{folder}
     # folder can be a file too, to check if it exist
-    def self.images_paths(folder="")
+    def self.images_paths(folder="", **args)
         folder = '' if folder == "/"
         folder += "*" if folder !~ /#{EXTENSION}$/
-        Dir.glob("#{WEBCOMIC_PATH}#{folder}").map{ |s| s.gsub(WEBCOMIC_PATH, '') }.sort{ |x, y|
+        filenames = Dir.glob("#{WEBCOMIC_PATH}#{folder}")
+        
+        if args[:no_folder]
+            filenames.keep_if{|f| File.file?(f) }
+        end
+        
+        filenames.map{ |s| s.gsub(WEBCOMIC_PATH, '') }.sort{ |x, y|
             x = x.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_f
             y = y.gsub(/#{EXTENSION}$/, '').gsub(/[^\.\d]/, '').to_f
             x <=> y
