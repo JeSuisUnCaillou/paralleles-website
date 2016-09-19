@@ -26,16 +26,25 @@ class Frame
     #
     def initialize(*ids_string)
         raise ArgumentError.new("only one or two images per frame") if ids_string.length > 2
-        @ids = ids_string.map{ |id|
-            id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
-            id.gsub(';', '/').gsub(',', '.')
-        }
-        @images_paths = @ids.map{ |id| id_to_image_path(id) }
-        @frame_paths = @ids.map{ |id| id_to_frame_path(id) }
-        
-        @next_ids = @ids.map{|id| Frame.get_next_images_ids(id) }.inject(:+)
-        @next_images_paths = @next_ids.map{ |id| id_to_image_path(id) }
-        @next_frames_paths = @next_ids.map{ |id| id_to_frame_path(id) }
+        if ids_string.blank?
+           @ids = [] 
+           @images_paths = []
+           @frame_paths = []
+           @next_ids = []
+           @next_images_paths = []
+           @next_frames_paths = []
+        else
+            @ids = ids_string.map{ |id|
+                id = "#{id}#{EXTENSION}" if id !~ /#{EXTENSION}$/
+                id.gsub(';', '/').gsub(',', '.')
+            }
+            @images_paths = @ids.map{ |id| id_to_image_path(id) }
+            @frame_paths = @ids.map{ |id| id_to_frame_path(id) }
+            
+            @next_ids = @ids.map{|id| Frame.get_next_images_ids(id) }.inject(:+)
+            @next_images_paths = @next_ids.map{ |id| id_to_image_path(id) }
+            @next_frames_paths = @next_ids.map{ |id| id_to_frame_path(id) }
+        end
     end
 
     #converts an id like "left/22.jpg" into its asset path
