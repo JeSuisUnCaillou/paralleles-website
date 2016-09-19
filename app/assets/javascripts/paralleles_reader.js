@@ -143,7 +143,7 @@ $(document).ready(function() {
             var prev_button = button_group.rect(button_width, button_height).attr({ fill: 'grey' }).translate(x, y)
             var prev_arrow = button_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             
-            prev_button.click(function(){
+            button_group.click(function(){
                 nb_slider_down = nb_slider_down + 1
                 nb_slider_right = nb_slider_right - left_slide
                 var with_movement = left_slide != 0 || up_unsplit != 0
@@ -169,7 +169,7 @@ $(document).ready(function() {
             var next_arrow = button_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             var with_movement = (right_slide != 0) || down_split != 0
             
-            next_button.click(function(){
+            button_group.click(function(){
                 //If we have already moved down the slider, just move it up without creating a next frame
                 if(nb_slider_down > 0){
                     nb_slider_down = nb_slider_down - 1
