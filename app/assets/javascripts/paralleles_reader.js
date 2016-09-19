@@ -139,8 +139,9 @@ $(document).ready(function() {
         var draw_prev_button = function(parent_group, button_width, x, y, left_slide, up_unsplit){
             //Do not create a prev button if we havent moved up the slider (aka : for the first frame)
             if(nb_slider_up == 0){ return null; }
-            var prev_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y)
-            var prev_arrow = parent_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
+            var button_group = parent_group.group().addClass('hoverable')
+            var prev_button = button_group.rect(button_width, button_height).attr({ fill: 'grey' }).translate(x, y)
+            var prev_arrow = button_group.polyline('0,50 50,0 100,50').translate(x + button_width / 2 - 50, y + button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             
             prev_button.click(function(){
                 nb_slider_down = nb_slider_down + 1
@@ -152,8 +153,9 @@ $(document).ready(function() {
         
         //Draw a dumb button for frames with no next
         var draw_dumb_button = function(parent_group, button_width, x, y){
-            var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
-            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "red" })
+            var button_group = parent_group.group().addClass('hoverable')
+            var next_button = button_group.rect(button_width, button_height).attr({ fill: 'grey' }).translate(x, y + frame_height - button_height)
+            var next_arrow = button_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "red" })
         }
         
         //Draw a next button in a parent_group, at a given position
@@ -162,8 +164,9 @@ $(document).ready(function() {
             //console.log(JSON.stringify(down_split))
             if(next_frames_paths == [undefined, undefined] || next_frames_paths.length == 0){ return null; }
             
-            var next_button = parent_group.rect(button_width, button_height).attr({ fill: 'grey' }).addClass('hoverable').translate(x, y + frame_height - button_height)
-            var next_arrow = parent_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
+            var button_group = parent_group.group().addClass('hoverable')
+            var next_button = button_group.rect(button_width, button_height).attr({ fill: 'grey' }).translate(x, y + frame_height - button_height)
+            var next_arrow = button_group.polyline('0,0 50,50 100,0').translate(x + button_width / 2 - 50, y + frame_height - button_height/2 - 25).fill('none').stroke({ width: 5, color: "blue" })
             var with_movement = (right_slide != 0) || down_split != 0
             
             next_button.click(function(){
