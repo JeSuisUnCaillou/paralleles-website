@@ -262,7 +262,21 @@ $(document).ready(function() {
         //Get the first frame
         $.ajax({url: starting_frame_paths[0], success: function(result){
             console.log(result);
-            create_frame(result["images_paths"], result["next_images_paths"], result["next_frames_paths"], 0);
+            var images_paths = result["images_paths"]
+            var next_images_paths = result["next_images_paths"]
+            var next_frames_paths = result["next_frames_paths"]
+            if(starting_frame_paths.length > 1){
+                 $.ajax({url: starting_frame_paths[1], success: function(result){
+                    console.log(result);
+                    images_paths = images_paths.concat(result["images_paths"])
+                    next_images_paths = next_images_paths.concat(result["next_images_paths"])
+                    next_frames_paths = next_frames_paths.concat(result["next_frames_paths"])
+                    
+                    create_frame(images_paths, next_images_paths, next_frames_paths, 0);
+                 }});
+            } else {
+                create_frame(images_paths, next_images_paths, next_frames_paths, 0);
+            }
         }});
         
     } else {
