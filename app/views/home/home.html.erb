@@ -5,7 +5,7 @@
     <h2>Storyboard</h2>
     <%= link_to "First image", root_path %> /
     <%= link_to "Frame 19", "?ids=19.jpg" %> /
-    <%= link_to "Frame 43", "?ids=left/43r.jpg|right/43b.jpg" %>
+    <%= link_to "Double Frame 43", "?ids=left/43r.jpg|right/43b.jpg" %>
     
     <div id="starting_frame" frame_paths="<%= @starting_frames.map{ |f| f.frame_paths } %>"></div>
     <div id="canevas" class="m-t-1">
